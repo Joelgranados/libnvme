@@ -7651,4 +7651,94 @@ enum nvme_io_mgmt_send_mo {
 	NVME_IO_MGMT_SEND_RUH_UPDATE = 0x1,
 };
 
+/**
+ * struct nvme_ns_mgmt_host_sw_specified_zns - Namespace management Host Software
+ * Specified Fields for Zoned Namespace.
+ * @znsco:     Zoned Namespace Create Options
+ *	      Bits 7-1: Reserved.
+ *	      Bits 0: Allocate ZRWA Resources (AZR): If set to ‘1’, then the
+ *	      namespace is to be created with the number of ZRWA resource specified
+ *	      in the RNUMZRWA field of this data structure. If cleared to ‘0’, then
+ *	      no ZRWA resources are allocated to the namespace to be created. If
+ *	      the ZRWASUP bit is cleared to ‘0’, then this field shall be ignored
+ *	      by the controller.
+ * @rar:       Requested Active Resources specifies the number of active
+ *	      resources to be allocated to the created namespace.
+ * @ror:       Requested Open Resources specifies the number of open resources
+ *	      to be allocated to the created namespace.
+ * @rnumzrwa:  Requested Number of ZRWA Resources specifies the number of ZRWA
+ *	      resources to be allocated to the created namespace.
+ */
+struct nvme_ns_mgmt_host_sw_specified_zns {
+	__u8			znsco;
+	__le32			rar;
+	__le32			ror;
+	__le32			rnumzrwa;
+} __attribute__((packed));
+
+/**
+ * struct nvme_ns_mgmt_host_sw_specified - Namespace management Host Software
+ * Specified Fields.
+ * @nsze:     Namespace Size indicates the total size of the namespace in
+ *	      logical blocks. The number of logical blocks is based on the
+ *	      formatted LBA size.
+ * @ncap:     Namespace Capacity indicates the maximum number of logical blocks
+ *	      that may be allocated in the namespace at any point in time. The
+ *	      number of logical blocks is based on the formatted LBA size.
+ * @rsvd16:   Reserved
+ * @flbas:    Formatted LBA Size, see &enum nvme_id_ns_flbas.
+ * @rsvd27:   Reserved
+ * @dps:      End-to-end Data Protection Type Settings, see
+ *	      &enum nvme_id_ns_dps.
+ * @nmic:     Namespace Multi-path I/O and Namespace Sharing Capabilities, see
+ *	      &enum nvme_id_ns_nmic.
+ * @rsvd31:   Reserved
+ * @anagrpid: ANA Group Identifier indicates the ANA Group Identifier of the
+ *	      ANA group of which the namespace is a member.
+ * @rsvd96:   Reserved
+ * @nvmsetid: NVM Set Identifier indicates the NVM Set with which this
+ *	      namespace is associated.
+ * @endgid:   Endurance Group Identifier indicates the Endurance Group with
+ *	      which this namespace is associated.
+ * @rsvd104:  Reserved
+ * @lbstm:    Logical Block Storage Tag Mask Identifies the mask for the
+ *        Storage Tag field for the protection information
+ * @nphndls:  Number of Placement Handles specifies the number of Placement
+ *        Handles included in the Placement Handle List
+ * @rsvd394:  Reserved
+ * @rsvd499:  Reserved for I/O Command Sets that extend this specification.
+ * @zns:      rsvd499( Zoned Namespace Command Set specific field )
+ *        see &struct nvme_ns_mgmt_host_sw_specified_zns.
+ * @phndl:    Placement Handle Associated RUH : This field specifies the Reclaim
+ *        Unit Handle Identifier to be associated with the Placement Handle
+ *        value. If the Flexible Data Placement capability is not supported or
+ *        not enabled in specified Endurance Group, then the controller shall
+ *        ignore this field.
+ * @rsvd768:   Reserved
+ */
+struct nvme_ns_mgmt_host_sw_specified {
+	__le64			nsze;
+	__le64			ncap;
+	__u8			rsvd16[10];
+	__u8			flbas;
+	__u8			rsvd27[2];
+	__u8			dps;
+	__u8			nmic;
+	__u8			rsvd31[61];
+	__le32			anagrpid;
+	__u8			rsvd96[4];
+	__le16			nvmsetid;
+	__le16			endgid;
+	__u8			rsvd104[280];
+	__le64			lbstm;
+	__le16			nphndls;
+	__u8			rsvd394[105];
+	union {
+		__u8		rsvd499[13];
+		struct nvme_ns_mgmt_host_sw_specified_zns zns;
+	};
+	__le16			phndl[128];
+	__u8			rsvd768[3328];
+};
+
 #endif /* _LIBNVME_TYPES_H */
